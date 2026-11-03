@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light" data-palette="aesthetic">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Book Tracker</title>
+
+<!-- ICONO DE APP (favicon + apple-touch-icon + PWA-ready) -->
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='0' height='0' rx='' fill='%238B6F6F'/%3E%3Ctext x='50' y='76' font-size='62' text-anchor='middle'%3E%F0%9F%93%9A%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%238B6F6F'/%3E%3Ctext x='50' y='76' font-size='62' text-anchor='middle'%3E%F0%9F%93%9A%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#8B6F6F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Book Tracker">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="Book Tracker — Rastreador de lecturas aesthetic con dashboard, retos y bingo.">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+[data-theme="light"]{--bg:#FDF8F5;--card:#FFFFFF;--soft:#F7EBE6;--text:#4A4A4A;
+  --muted:#9B8B87;--border:#EAD9D3;--shadow:rgba(139,111,111,.08);
+  --green-bg:#DCEAD8;--green-fg:#4A6B3E;--yellow-bg:#FBF0D0;--yellow-fg:#8A6D1E;
+  --gray-bg:#EDE9E7;--gray-fg:#7A6E68;--blue-bg:#DDE8F0;--blue-fg:#3E5F7A;
+  --red-bg:#F5DCDC;--red-fg:#8A3E3E;}
+[data-theme="dark"]{--bg:#1A1614;--card:#242020;--soft:#2E2825;--text:#E8E0DC;
+  --muted:#8B7A76;--border:#3A3330;--shadow:rgba(0,0,0,.35);
+  --green-bg:#2A3A26;--green-fg:#B8D4A8;--yellow-bg:#3A3018;--yellow-fg:#E8CC80;
+  --gray-bg:#332C29;--gray-fg:#B0A5A0;--blue-bg:#243440;--blue-fg:#A8C8E0;
+  --red-bg:#3A2424;--red-fg:#E0A8A8;}
+[data-palette="aesthetic"][data-theme="light"]{--header:#8B6F6F;--accent:#D4A5A5;--on-header:#FFFFFF;}
+[data-palette="aesthetic"][data-theme="dark"]{--header:#D4A5A5;--accent:#B08D8D;--on-header:#1A1614;}
+[data-palette="coquette"][data-theme="light"]{--header:#C48B9F;--accent:#F0C8D8;--on-header:#FFFFFF;}
+[data-palette="coquette"][data-theme="dark"]{--header:#E8B0C4;--accent:#B08898;--on-header:#1A1614;}
+[data-palette="dark-academia"][data-theme="light"]{--header:#5C4A3A;--accent:#A88B6B;--on-header:#F5EFE6;}
+[data-palette="dark-academia"][data-theme="dark"]{--header:#C8A882;--accent:#8B6F4E;--on-header:#1A1614;}
+[data-palette="pastel"][data-theme="light"]{--header:#8FA8C8;--accent:#D5C6E8;--on-header:#FFFFFF;}
+[data-palette="pastel"][data-theme="dark"]{--header:#B8CCE0;--accent:#A898C4;--on-header:#1A1614;}
+[data-palette="minimal"][data-theme="light"]{--header:#2F2F2F;--accent:#BFC8C5;--on-header:#FFFFFF;}
+[data-palette="minimal"][data-theme="dark"]{--header:#E8E8E8;--accent:#909896;--on-header:#1A1614;}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{overflow-x:hidden;width:100%;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);
+  padding:24px;min-height:100vh;transition:background .3s,color .3s;}
+header{text-align:center;margin-bottom:22px;position:relative;}
+h1{color:var(--header);font-size:26px;letter-spacing:1px;transition:color .3s;}
+.greeting{font-size:14px;color:var(--header);font-weight:600;margin-top:6px;transition:color .3s;}
+.tagline{color:var(--muted);font-size:12px;margin-top:4px;}
+.top-controls{position:absolute;top:0;right:0;display:flex;gap:8px;align-items:center;}
+.icon-btn-header{width:42px;height:42px;border-radius:50%;border:1px solid var(--border);
+  background:var(--card);color:var(--text);font-size:16px;cursor:pointer;transition:.3s;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-family:inherit;}
+.icon-btn-header:hover{background:var(--soft);transform:rotate(15deg);}
+.icon-btn-header.lang{font-size:12px;letter-spacing:.5px;}
+
+.tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;}
+.tab{padding:10px 16px;border-radius:20px;background:var(--card);border:1px solid var(--border);
+  cursor:pointer;font-size:13px;transition:.2s;color:var(--muted);}
+.tab:hover{background:var(--soft);}
+.tab.active{background:var(--header);color:var(--on-header);border-color:var(--header);}
+.panel{display:none;max-width:1100px;margin:0 auto;width:100%;}
+.panel.active{display:block;}
+.card{background:var(--card);border-radius:14px;padding:20px;border:1px solid var(--border);
+  box-shadow:0 2px 8px var(--shadow);margin-bottom:16px;transition:background .3s,border .3s;
+  max-width:100%;overflow:hidden;}
+.card h3{color:var(--header);transition:color .3s;}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:20px;}
+.kpi{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);
+  text-align:center;transition:background .3s;}
+.kpi .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.kpi .value{font-size:26px;font-weight:700;color:var(--header);transition:color .3s;}
+
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px;}
+input,select,textarea{padding:10px 12px;border:1px solid var(--border);border-radius:8px;
+  font-size:13px;background:var(--soft);font-family:inherit;color:var(--text);transition:.2s;
+  width:100%;max-width:100%;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);}
+button{padding:10px 18px;border:none;border-radius:8px;cursor:pointer;background:var(--header);
+  color:var(--on-header);font-size:13px;font-weight:600;transition:.2s;font-family:inherit;
+  max-width:100%;}
+button:hover{filter:brightness(.92);}
+button.ghost{background:var(--soft);color:var(--text);border:1px solid var(--border);}
+button.ghost:hover{background:var(--border);}
+button.danger{background:#C97A7A;color:#fff;}
+button.small{padding:5px 9px;font-size:12px;border-radius:6px;}
+button.icon-btn{padding:6px 9px;font-size:14px;line-height:1;}
+
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:var(--header);color:var(--on-header);padding:12px 8px;text-align:left;
+  font-size:11px;text-transform:uppercase;letter-spacing:.5px;position:sticky;top:0;}
+td{padding:10px 8px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:hover td{background:var(--soft);}
+.badge{padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap;display:inline-block;}
+.b-leido{background:var(--green-bg);color:var(--green-fg);}
+.b-leyendo{background:var(--yellow-bg);color:var(--yellow-fg);}
+.b-porleer{background:var(--gray-bg);color:var(--gray-fg);}
+.b-pausado{background:var(--blue-bg);color:var(--blue-fg);}
+.b-abandonado{background:var(--red-bg);color:var(--red-fg);}
+
+.mini-bar{width:90px;height:6px;background:var(--soft);border-radius:3px;overflow:hidden;margin-bottom:4px;}
+.mini-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .4s;}
+.mini-text{font-size:10px;color:var(--muted);white-space:nowrap;}
+
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px;}
+.book{background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:10px;text-align:center;transition:.2s;}
+.book:hover{transform:translateY(-4px);box-shadow:0 6px 16px var(--shadow);}
+.book img{width:100%;height:170px;object-fit:cover;border-radius:6px;background:var(--soft);}
+.book .title{font-size:11px;font-weight:700;margin-top:8px;color:var(--text);}
+.book .author{font-size:10px;color:var(--muted);margin-top:2px;}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;
+  justify-content:center;z-index:99;padding:16px;backdrop-filter:blur(2px);}
+.modal-bg.open{display:flex;}
+.modal{background:var(--card);border-radius:14px;padding:22px;max-width:600px;
+  width:100%;max-height:90vh;overflow:auto;border:1px solid var(--border);}
+.modal h3{color:var(--header);margin-bottom:14px;}
+.modal label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.5px;margin-bottom:4px;}
+.modal .field{margin-bottom:12px;}
+.modal .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.modal .actions{display:flex;gap:10px;margin-top:18px;justify-content:flex-end;flex-wrap:wrap;}
+.empty{text-align:center;color:var(--muted);padding:40px;font-style:italic;}
+
+.progress-bar{height:10px;background:var(--soft);border-radius:5px;overflow:hidden;margin-top:6px;}
+.progress-fill{height:100%;background:var(--accent);border-radius:5px;transition:width .5s;}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
+  background:var(--header);color:var(--on-header);padding:12px 22px;border-radius:24px;
+  font-size:13px;font-weight:600;box-shadow:0 6px 24px rgba(0,0,0,.25);opacity:0;
+  transition:.4s;z-index:400;max-width:90vw;text-align:center;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+.reto-item{padding:14px;border:1px solid var(--border);border-radius:10px;
+  background:var(--soft);margin-bottom:10px;}
+.reto-head{display:flex;justify-content:space-between;align-items:center;gap:8px;
+  margin-bottom:8px;flex-wrap:wrap;}
+
+/*    BINGO — responsive blindado */
+
+.bingo-grid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:8px;
+  max-width:640px;
+  margin:0 auto;
+  width:100%;
+}
+.bingo-cell{
+  aspect-ratio:1 / 1;
+  min-width:0;
+  min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:5px;
+  font-size:11px;
+  font-weight:500;
+  line-height:1.25;
+  border:2px solid var(--border);
+  border-radius:10px;
+  cursor:pointer;
+  transition:.2s;
+  background:var(--card);
+  user-select:none;
+  color:var(--text);
+  overflow:hidden;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  hyphens:auto;
+}
+.bingo-cell:hover{transform:scale(1.04);border-color:var(--accent);box-shadow:0 4px 12px var(--shadow);}
+.bingo-cell.checked{background:var(--header);color:var(--on-header);border-color:var(--header);
+  font-weight:700;text-decoration:line-through;opacity:.88;}
+
+.bingo-edit-grid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:8px;
+  margin-bottom:16px;
+  width:100%;
+}
+.bingo-edit-grid input{
+  padding:7px 5px;
+  font-size:11px;
+  text-align:center;
+  border-radius:6px;
+  line-height:1.2;
+  min-width:0;
+}
+
+.palette-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;}
+.palette-swatch{display:flex;flex-direction:column;gap:8px;padding:12px;border:2px solid var(--border);
+  border-radius:10px;background:var(--card);color:var(--text);cursor:pointer;transition:.2s;
+  font-size:12px;font-weight:600;text-align:left;align-items:stretch;font-family:inherit;}
+.palette-swatch:hover{border-color:var(--accent);transform:translateY(-2px);}
+.palette-swatch.active{border-color:var(--header);box-shadow:0 0 0 3px var(--accent);}
+.swatch-row{display:flex;gap:4px;height:26px;}
+.swatch-color{flex:1;border-radius:5px;}
+
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+@media(max-width:800px){.chart-grid{grid-template-columns:1fr;}}
+.chart-container{position:relative;height:300px;}
+
+/*    FOOTER */
+
+.site-footer{
+  max-width:1100px;
+  margin:36px auto 8px;
+  padding:18px 20px 10px;
+  text-align:center;
+  font-size:12px;
+  line-height:1.2;
+  color:var(--muted);
+  border-top:1px solid var(--border);
+  transition:color .3s, border-color .3s;
+}
+.site-footer .footer-title{
+  font-size:13px;font-weight:700;color:var(--header);
+  letter-spacing:.4px;line-height:1.2;margin-bottom:8px;transition:color .3s;
+}
+.site-footer .footer-version{
+  font-weight:400;opacity:.75;font-size:11px;margin-left:4px;
+}
+.site-footer .footer-dev{line-height:1.2;margin-bottom:6px;}
+.site-footer .footer-dev div{line-height:1.2;}
+.site-footer .footer-dev strong{color:var(--text);font-weight:600;transition:color .3s;}
+.site-footer a{color:var(--header);text-decoration:none;transition:opacity .2s, color .3s;}
+.site-footer a:hover{opacity:.75;text-decoration:underline;}
+.site-footer .footer-copy{
+  line-height:1.2;font-size:11px;opacity:.75;letter-spacing:.2px;margin-top:6px;
+}
+
+/*   RESPONSIVE — tablet */
+
+@media(max-width:800px){
+  .chart-grid{grid-template-columns:1fr;}
+}
+
+/*    RESPONSIVE — móvil grande */
+
+@media(max-width:700px){
+  body{padding:18px 12px 14px;}
+  h1{font-size:22px;}
+  .greeting{font-size:13px;}
+  .tagline{font-size:11px;}
+  .top-controls .icon-btn-header{width:36px;height:36px;font-size:14px;}
+  .tab{padding:8px 12px;font-size:12px;}
+  .card{padding:14px;border-radius:12px;}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+  .kpi{padding:12px;}
+  .kpi .value{font-size:20px;}
+  .kpi .label{font-size:10px;}
+  .modal{padding:18px;border-radius:12px;}
+  .modal .row{grid-template-columns:1fr;}
+  .mini-bar{width:64px;}
+  form{grid-template-columns:1fr;}
+  .toolbar{flex-direction:column;align-items:stretch;}
+  .toolbar input, .toolbar select, .toolbar button{width:100%;max-width:100%;}
+  .shelf{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+  .book img{height:140px;}
+  .reto-head{flex-direction:column;align-items:flex-start;}
+  .reto-head > div:last-child{width:100%;justify-content:flex-end;}
+  .site-footer{margin-top:24px;padding:14px 10px 8px;font-size:11px;}
+  .site-footer .footer-title{font-size:12px;}
+  .site-footer .footer-copy{font-size:10px;}
+  .chart-container{height:260px;}
+}
+
+/*    RESPONSIVE — móvil pequeño */
+
+@media(max-width:520px){
+  /* BINGO más compacto */
+  .bingo-grid{gap:4px;}
+  .bingo-cell{
+    font-size:clamp(7px, 2.2vw, 9px);
+    padding:2px;
+    line-height:1.15;
+    border-width:1.5px;
+    border-radius:7px;
+    letter-spacing:-.2px;
+  }
+  .bingo-cell:hover{transform:none;box-shadow:none;}
+  .bingo-edit-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;}
+  .bingo-edit-grid input{font-size:10px;padding:5px 3px;}
+
+  .chart-container{height:240px;}
+  .kpis{grid-template-columns:1fr 1fr;}
+  .kpi .value{font-size:18px;}
+  .tab{padding:7px 10px;font-size:11px;}
+  h1{font-size:20px;}
+  .card h3{font-size:15px;}
+
+  table{font-size:12px;}
+  th,td{padding:8px 5px;}
+
+  .modal{padding:16px;}
+  .modal h3{font-size:16px;}
+  .modal .actions{justify-content:stretch;}
+  .modal .actions button{flex:1;}
+
+  .shelf{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+  .book{padding:8px;}
+  .book img{height:120px;}
+  .book .title{font-size:10px;}
+
+  .toast{font-size:12px;padding:10px 16px;}
+}
+
+/*    RESPONSIVE — móvil muy pequeño */
+
+@media(max-width:380px){
+  .bingo-cell{font-size:7px;padding:1px;border-radius:5px;}
+  .bingo-grid{gap:3px;}
+  .kpis{grid-template-columns:1fr;}
+  h1{font-size:18px;}
+  body{padding:14px 10px 12px;}
+  .tabs{gap:5px;}
+  .tab{padding:6px 9px;font-size:10px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="top-controls">
+    <button class="icon-btn-header lang" id="langToggle" title="Idioma / Language">ES</button>
+    <button class="icon-btn-header" id="themeToggle" title="Tema">🌙</button>
+  </div>
+  <h1 data-i18n="app.title">📚 Book Tracker</h1>
+  <p class="greeting" id="greeting"></p>
+  <p class="tagline" data-i18n="app.tagline">Tus datos se guardan automáticamente en este navegador</p>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-tab="dashboard" data-i18n="tab.dashboard">📊 Dashboard</div>
+  <div class="tab" data-tab="log" data-i18n="tab.log">📖 Book Log</div>
+  <div class="tab" data-tab="shelf" data-i18n="tab.shelf">🖼️ Bookshelf</div>
+  <div class="tab" data-tab="retos" data-i18n="tab.retos">🏆 Retos</div>
+  <div class="tab" data-tab="setup" data-i18n="tab.setup">⚙️ Ajustes</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="panel active" id="dashboard">
+  <div class="kpis" id="kpis"></div>
+  <div class="card">
+    <h3 style="margin-bottom:12px;" data-i18n="dash.goalTitle">🎯 Progreso de la meta anual</h3>
+    <div class="progress-bar"><div class="progress-fill" id="goalProgress"></div></div>
+    <p id="goalText" style="font-size:12px;color:var(--muted);margin-top:8px;"></p>
+  </div>
+  <div class="chart-grid">
+    <div class="card">
+      <h3 style="margin-bottom:12px;"><span data-i18n="dash.chartMonthly">📅 Libros leídos por mes</span> · <span id="chartYear"></span></h3>
+      <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:12px;" data-i18n="dash.chartFormat">🎨 Distribución por formato</h3>
+      <div class="chart-container"><canvas id="formatChart"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:12px;" data-i18n="dash.genreTitle">📚 Libros por género</h3>
+    <div id="genreStats"></div>
+  </div>
+</div>
+
+<!-- BOOK LOG -->
+<div class="panel" id="log">
+  <div class="card">
+    <h3 style="margin-bottom:12px;" data-i18n="log.addTitle">➕ Añadir libro</h3>
+    <form id="bookForm">
+      <input name="title" data-i18n-placeholder="form.title" placeholder="Título *" required>
+      <input name="author" data-i18n-placeholder="form.author" placeholder="Autor" required>
+      <input name="cover" data-i18n-placeholder="form.cover" placeholder="URL de portada (opcional)">
+      <input name="series" data-i18n-placeholder="form.series" placeholder="Serie/Saga (opcional)">
+      <input name="volume" type="number" data-i18n-placeholder="form.volume" placeholder="Vol. #" min="0">
+      <select name="genre" id="genreSelect"></select>
+      <select name="format" id="formatSelect"></select>
+      <input name="pages" type="number" data-i18n-placeholder="form.pages" placeholder="Páginas totales" min="0">
+      <input name="pagesRead" type="number" data-i18n-placeholder="form.pagesRead" placeholder="Páginas leídas" min="0">
+      <select name="status" id="statusSelect"></select>
+      <input name="start" type="date" title="Inicio">
+      <input name="end" type="date" title="Fin">
+      <select name="rating" id="ratingSelect"></select>
+      <input name="notes" data-i18n-placeholder="form.notes" placeholder="Notas / Citas">
+      <button type="submit" data-i18n="form.addBtn">Añadir libro</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="toolbar">
+      <input id="search" data-i18n-placeholder="log.search" placeholder="🔍 Buscar..." style="flex:1;min-width:180px;">
+      <select id="filterStatus" style="max-width:200px;"></select>
+      <button class="ghost" onclick="exportJSON()" data-i18n="log.export">💾 Exportar</button>
+      <button class="ghost" onclick="document.getElementById('importFile').click()" data-i18n="log.import">📂 Importar</button>
+      <input type="file" id="importFile" accept=".json" hidden>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr>
+          <th data-i18n="log.thTitle">Título</th>
+          <th data-i18n="log.thAuthor">Autor</th>
+          <th data-i18n="log.thGenre">Género</th>
+          <th data-i18n="log.thFormat">Formato</th>
+          <th data-i18n="log.thProgress">Progreso</th>
+          <th data-i18n="log.thStatus">Estado</th>
+          <th data-i18n="log.thEnd">Fin</th>
+          <th data-i18n="log.thRating">Rating</th>
+          <th data-i18n="log.thActions">Acciones</th>
+        </tr></thead>
+        <tbody id="logBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- SHELF -->
+<div class="panel" id="shelf">
+  <div class="card">
+    <h3 style="margin-bottom:12px;" data-i18n="shelf.title">🖼️ Mi estantería</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px;" data-i18n="shelf.subtitle">Libros leídos o leyendo actualmente</p>
+    <div class="shelf" id="shelfGrid"></div>
+  </div>
+</div>
+
+<!-- RETOS -->
+<div class="panel" id="retos">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+      <h3 style="margin:0;" data-i18n="retos.title">🎯 Retos anuales</h3>
+      <button onclick="openRetoModal()" data-i18n="retos.newBtn">+ Nuevo reto</button>
+    </div>
+    <div id="retosList"></div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+      <h3 style="margin:0;" data-i18n="bingo.title">🏆 Bingo de lectura 5×5</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button onclick="openBingoEditModal()" data-i18n="bingo.editBtn">✏️ Editar casillas</button>
+        <button class="ghost" onclick="resetBingo()" data-i18n="bingo.reset">🔄 Reiniciar</button>
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px;" data-i18n="bingo.subtitle">Marca cada casilla cuando completes el reto. Consigue 5 en línea para hacer ¡BINGO!</p>
+    <div class="bingo-grid" id="bingoGrid"></div>
+    <div style="margin-top:14px;text-align:center;font-size:12px;color:var(--muted);"><span id="bingoStats"></span></div>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div class="panel" id="setup">
+  <div class="card">
+    <h3 style="margin-bottom:12px;" data-i18n="setup.personal">👤 Personalización</h3>
+    <form id="personalForm">
+      <div class="field">
+        <label data-i18n="setup.nameLabel">Tu nombre</label>
+        <input name="name" id="nameInput" placeholder="Ej: María" maxlength="40">
+      </div>
+      <button type="submit" data-i18n="setup.save">Guardar</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:12px;" data-i18n="setup.config">⚙️ Configuración</h3>
+    <form id="setupForm">
+      <div class="field">
+        <label data-i18n="setup.goalLabel">🎯 Meta anual de libros</label>
+        <input name="goal" type="number" id="goalInput" min="1">
+      </div>
+      <div class="field">
+        <label data-i18n="setup.yearLabel">📅 Año en curso</label>
+        <input name="year" type="number" id="yearInput">
+      </div>
+      <div class="field">
+        <label data-i18n="setup.langLabel">🌍 Idioma / Language</label>
+        <select id="langSelect">
+          <option value="es">🇪🇸 Español</option>
+          <option value="en">🇬🇧 English</option>
+        </select>
+      </div>
+      <button type="submit" data-i18n="setup.saveChanges">Guardar cambios</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:12px;" data-i18n="setup.paletteTitle">🎨 Paleta de colores</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px;" data-i18n="setup.paletteSubtitle">Combínala con el modo claro/oscuro usando el botón 🌙 arriba a la derecha.</p>
+    <div class="palette-grid" id="paletteGrid"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:12px;" data-i18n="setup.dataTitle">🗑️ Zona de datos</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;" data-i18n="setup.dataSubtitle">"Restaurar ejemplos" reemplaza todo con datos de demostración.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="ghost" onclick="restoreExamples()" data-i18n="setup.restore">🔄 Restaurar ejemplos</button>
+      <button class="danger" onclick="resetAll()" data-i18n="setup.wipe">🗑️ Borrar todo</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR LIBRO -->
+<div class="modal-bg" id="editModal">
+  <div class="modal">
+    <h3 data-i18n="modal.editTitle">✏️ Editar libro</h3>
+    <form id="editForm">
+      <input type="hidden" name="id">
+      <div class="row">
+        <div class="field"><label data-i18n="form.title">Título *</label><input name="title" required></div>
+        <div class="field"><label data-i18n="form.author">Autor *</label><input name="author" required></div>
+      </div>
+      <div class="field"><label data-i18n="form.cover">URL de portada</label><input name="cover"></div>
+      <div class="row">
+        <div class="field"><label data-i18n="form.series">Serie / Saga</label><input name="series"></div>
+        <div class="field"><label data-i18n="form.volume">Vol. #</label><input name="volume" type="number" min="0"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label data-i18n="form.genre">Género</label><select name="genre" id="editGenreSelect"></select></div>
+        <div class="field"><label data-i18n="form.format">Formato</label><select name="format" id="editFormatSelect"></select></div>
+      </div>
+      <div class="row">
+        <div class="field"><label data-i18n="form.pages">Páginas totales</label><input name="pages" type="number" min="0"></div>
+        <div class="field"><label data-i18n="form.pagesRead">Páginas leídas</label><input name="pagesRead" type="number" min="0"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label data-i18n="form.status">Estado</label><select name="status" id="editStatusSelect"></select></div>
+        <div class="field"><label data-i18n="form.rating">Rating</label><select name="rating" id="editRatingSelect"></select></div>
+      </div>
+      <div class="row">
+        <div class="field"><label data-i18n="form.start">Inicio</label><input name="start" type="date"></div>
+        <div class="field"><label data-i18n="form.end">Fin</label><input name="end" type="date"></div>
+      </div>
+      <div class="field"><label data-i18n="form.notes">Notas / Citas</label><textarea name="notes" rows="3"></textarea></div>
+      <div class="actions">
+        <button type="button" class="ghost" onclick="closeModal('editModal')" data-i18n="modal.cancel">Cancelar</button>
+        <button type="submit" data-i18n="modal.save">💾 Guardar cambios</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL PROGRESO -->
+<div class="modal-bg" id="pagesModal">
+  <div class="modal" style="max-width:440px;">
+    <h3 data-i18n="modal.progressTitle">📖 Actualizar progreso</h3>
+    <p id="pagesBookTitle" style="color:var(--muted);font-size:13px;margin-bottom:14px;"></p>
+    <div id="pagesCurrentInfo" style="margin-bottom:16px;"></div>
+    <form id="pagesForm">
+      <input type="hidden" name="id">
+      <div class="field">
+        <label data-i18n="form.pagesReadFull">Página actual / Páginas leídas</label>
+        <input name="pagesRead" type="number" min="0" required autofocus>
+      </div>
+      <div class="actions">
+        <button type="button" class="ghost" onclick="closeModal('pagesModal')" data-i18n="modal.cancel">Cancelar</button>
+        <button type="submit" data-i18n="modal.update">✅ Actualizar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL RETO -->
+<div class="modal-bg" id="retoModal">
+  <div class="modal" style="max-width:440px;">
+    <h3 id="retoModalTitle" data-i18n="modal.retoTitle">🎯 Nuevo reto</h3>
+    <form id="retoForm">
+      <input type="hidden" name="id">
+      <div class="field">
+        <label data-i18n="form.retoName">Nombre del reto</label>
+        <input name="nombre" required placeholder="Ej: Leer 12 clásicos">
+      </div>
+      <div class="row">
+        <div class="field"><label data-i18n="form.retoGoal">Meta</label><input name="meta" type="number" min="1" required></div>
+        <div class="field"><label data-i18n="form.retoActual">Actual</label><input name="actual" type="number" min="0" value="0"></div>
+      </div>
+      <div class="field"><label data-i18n="form.retoNotes">Notas (opcional)</label><input name="notas"></div>
+      <div class="actions">
+        <button type="button" class="ghost" onclick="closeModal('retoModal')" data-i18n="modal.cancel">Cancelar</button>
+        <button type="submit" data-i18n="modal.saveShort">💾 Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL EDITAR BINGO -->
+<div class="modal-bg" id="bingoEditModal">
+  <div class="modal" style="max-width:760px;">
+    <h3 data-i18n="bingo.editTitle">✏️ Editar casillas del Bingo</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px;" data-i18n="bingo.editSubtitle">Personaliza los 25 retos. Deja un campo vacío para mantener el texto actual.</p>
+    <div class="bingo-edit-grid" id="bingoEditGrid"></div>
+    <div class="actions" style="justify-content:space-between;">
+      <button type="button" class="ghost" onclick="resetBingoTexts()" data-i18n="bingo.resetTexts">↺ Texto por defecto</button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button type="button" class="ghost" onclick="closeModal('bingoEditModal')" data-i18n="modal.cancel">Cancelar</button>
+        <button type="button" onclick="saveBingoTexts()" data-i18n="bingo.saveTexts">💾 Guardar textos</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-title">
+    📚 Book Tracker<span class="footer-version" data-i18n="footer.version">· Versión 1.0</span>
+  </div>
+  <div class="footer-dev">
+    <div><span data-i18n="footer.dev">Desarrollado por:</span> <strong>Jesús Hernández</strong></div>
+    <div><a href="mailto:info.mergerconsulting@gmail.com">info.mergerconsulting@gmail.com</a></div>
+  </div>
+  <div class="footer-copy" data-i18n="footer.rights">
+    © 2026 Todos los derechos reservados.
+  </div>
+</footer>
+
+<script>
+    /* 1. TRADUCCIONES */
+
+const I18N = {
+  es:{
+    'app.title':'📚 Book Tracker','app.tagline':'Tus datos se guardan automáticamente en este navegador',
+    'app.greeting':'¡Hola, {name}! 👋','app.greetingEmpty':'Bienvenido/a a tu biblioteca',
+    'tab.dashboard':'📊 Dashboard','tab.log':'📖 Book Log','tab.shelf':'🖼️ Bookshelf',
+    'tab.retos':'🏆 Retos','tab.setup':'⚙️ Ajustes',
+    'dash.goalTitle':'🎯 Progreso de la meta anual','dash.genreTitle':'📚 Libros por género',
+    'dash.chartMonthly':'📅 Libros leídos por mes','dash.chartFormat':'🎨 Distribución por formato',
+    'dash.kpiBooks':'📚 Libros leídos','dash.kpiPages':'📄 Páginas leídas',
+    'dash.kpiReading':'📖 Leyendo ahora','dash.kpiPct':'📈 % Avance meta',
+    'dash.goalText':'{n} de {meta} libros · {pages} páginas totales','dash.goalExtra':' · {p} págs en curso',
+    'dash.emptyGenre':'Aún no hay libros leídos',
+    'log.addTitle':'➕ Añadir libro','log.search':'🔍 Buscar...','log.filterAll':'Todos los estados',
+    'log.export':'💾 Exportar','log.import':'📂 Importar','log.empty':'No hay libros que mostrar',
+    'log.thTitle':'Título','log.thAuthor':'Autor','log.thGenre':'Género','log.thFormat':'Formato',
+    'log.thProgress':'Progreso','log.thStatus':'Estado','log.thEnd':'Fin','log.thRating':'Rating','log.thActions':'Acciones',
+    'form.title':'Título *','form.author':'Autor','form.cover':'URL de portada (opcional)',
+    'form.series':'Serie/Saga (opcional)','form.volume':'Vol. #','form.pages':'Páginas totales',
+    'form.pagesRead':'Páginas leídas','form.notes':'Notas / Citas','form.addBtn':'Añadir libro',
+    'form.genre':'Género','form.format':'Formato','form.status':'Estado','form.rating':'Rating',
+    'form.start':'Inicio','form.end':'Fin','form.pagesReadFull':'Página actual / Páginas leídas',
+    'form.retoName':'Nombre del reto','form.retoGoal':'Meta','form.retoActual':'Actual','form.retoNotes':'Notas (opcional)',
+    'shelf.title':'🖼️ Mi estantería','shelf.subtitle':'Libros leídos o leyendo actualmente',
+    'shelf.empty':'Marca libros como "Leído" o "Leyendo" para verlos aquí',
+    'retos.title':'🎯 Retos anuales','retos.newBtn':'+ Nuevo reto',
+    'bingo.title':'🏆 Bingo de lectura 5×5','bingo.reset':'🔄 Reiniciar',
+    'bingo.subtitle':'Marca cada casilla cuando completes el reto. Consigue 5 en línea para hacer ¡BINGO!',
+    'bingo.stats':'{checked}/25 casillas · {lines} línea(s) completada(s)',
+    'bingo.editBtn':'✏️ Editar casillas','bingo.editTitle':'✏️ Editar casillas del Bingo',
+    'bingo.editSubtitle':'Personaliza los 25 retos. Deja un campo vacío para mantener el texto actual.',
+    'bingo.resetTexts':'↺ Texto por defecto','bingo.saveTexts':'💾 Guardar textos',
+    'setup.personal':'👤 Personalización','setup.nameLabel':'Tu nombre','setup.save':'Guardar',
+    'setup.config':'⚙️ Configuración','setup.goalLabel':'🎯 Meta anual de libros',
+    'setup.yearLabel':'📅 Año en curso','setup.langLabel':'🌍 Idioma / Language',
+    'setup.saveChanges':'Guardar cambios','setup.paletteTitle':'🎨 Paleta de colores',
+    'setup.paletteSubtitle':'Combínala con el modo claro/oscuro usando el botón 🌙 arriba a la derecha.',
+    'setup.dataTitle':'🗑️ Zona de datos','setup.dataSubtitle':'"Restaurar ejemplos" reemplaza todo con datos de demostración.',
+    'setup.restore':'🔄 Restaurar ejemplos','setup.wipe':'🗑️ Borrar todo',
+    'modal.editTitle':'✏️ Editar libro','modal.cancel':'Cancelar','modal.save':'💾 Guardar cambios',
+    'modal.update':'✅ Actualizar','modal.progressTitle':'📖 Actualizar progreso',
+    'modal.retoTitle':'🎯 Nuevo reto','modal.retoTitleEdit':'✏️ Editar reto','modal.saveShort':'💾 Guardar',
+    'toast.bookAdded':'✅ Libro añadido','toast.changesSaved':'💾 Cambios guardados',
+    'toast.progressUpdated':'📖 Progreso actualizado','toast.bookFinished':'🎉 ¡Libro terminado!',
+    'toast.bookDeleted':'🗑️ Libro eliminado','toast.backupSaved':'💾 Backup descargado',
+    'toast.imported':'✅ Importado correctamente','toast.settingsSaved':'✅ Ajustes guardados',
+    'toast.retoSaved':'💾 Reto guardado','toast.retoDeleted':'🗑️ Reto eliminado',
+    'toast.bingoReset':'🔄 Bingo reiniciado','toast.examplesRestored':'📚 Ejemplos restaurados',
+    'toast.wiped':'🗑️ Biblioteca vaciada','toast.nameSaved':'👤 Nombre guardado',
+    'toast.bingoLine':'🎉 ¡BINGO! Has completado {n} línea(s)','toast.retoDone':'🎉 ¡Reto completado: {name}!',
+    'toast.bingoTextsSaved':'💾 Casillas del bingo guardadas','toast.bingoTextsReset':'↺ Texto por defecto restaurado',
+    'confirm.deleteBook':'¿Eliminar "{title}"?','confirm.deleteReto':'¿Eliminar este reto?',
+    'confirm.resetBingo':'¿Reiniciar todo el bingo? Se desmarcarán las 25 casillas.',
+    'confirm.import':'¿Importar {n} libros? Se reemplazarán los actuales.',
+    'confirm.wipe1':'⚠️ Esto borrará TODOS tus libros, retos y bingo. ¿Continuar?',
+    'confirm.wipe2':'¿Estás completamente seguro? No se puede deshacer.',
+    'confirm.restore':'Esto reemplazará tus datos actuales con los ejemplos. ¿Continuar?',
+    'confirm.bingoResetTexts':'¿Restaurar los textos por defecto? Se perderán tus personalizaciones.',
+    'chart.noChart':'No se pudo cargar Chart.js. Revisa tu conexión a internet.',
+    'chart.booksRead':'Libros leídos','chart.books':'libro','chart.booksPlural':'libros',
+    'footer.version':'· Versión 1.0','footer.dev':'Desarrollado por:','footer.rights':'© 2026 Todos los derechos reservados.'
+  },
+  en:{
+    'app.title':'📚 Book Tracker','app.tagline':'Your data is saved automatically in this browser',
+    'app.greeting':'Hi, {name}! 👋','app.greetingEmpty':'Welcome to your library',
+    'tab.dashboard':'📊 Dashboard','tab.log':'📖 Book Log','tab.shelf':'🖼️ Bookshelf',
+    'tab.retos':'🏆 Challenges','tab.setup':'⚙️ Settings',
+    'dash.goalTitle':'🎯 Yearly goal progress','dash.genreTitle':'📚 Books by genre',
+    'dash.chartMonthly':'📅 Books read per month','dash.chartFormat':'🎨 Format distribution',
+    'dash.kpiBooks':'📚 Books read','dash.kpiPages':'📄 Pages read',
+    'dash.kpiReading':'📖 Currently reading','dash.kpiPct':'📈 % Goal progress',
+    'dash.goalText':'{n} of {meta} books · {pages} total pages','dash.goalExtra':' · {p} pages in progress',
+    'dash.emptyGenre':'No books read yet',
+    'log.addTitle':'➕ Add book','log.search':'🔍 Search...','log.filterAll':'All statuses',
+    'log.export':'💾 Export','log.import':'📂 Import','log.empty':'No books to display',
+    'log.thTitle':'Title','log.thAuthor':'Author','log.thGenre':'Genre','log.thFormat':'Format',
+    'log.thProgress':'Progress','log.thStatus':'Status','log.thEnd':'Finished','log.thRating':'Rating','log.thActions':'Actions',
+    'form.title':'Title *','form.author':'Author','form.cover':'Cover URL (optional)',
+    'form.series':'Series (optional)','form.volume':'Vol. #','form.pages':'Total pages',
+    'form.pagesRead':'Pages read','form.notes':'Notes / Quotes','form.addBtn':'Add book',
+    'form.genre':'Genre','form.format':'Format','form.status':'Status','form.rating':'Rating',
+    'form.start':'Start','form.end':'Finish','form.pagesReadFull':'Current page / Pages read',
+    'form.retoName':'Challenge name','form.retoGoal':'Goal','form.retoActual':'Current','form.retoNotes':'Notes (optional)',
+    'shelf.title':'🖼️ My bookshelf','shelf.subtitle':'Books read or currently reading',
+    'shelf.empty':'Mark books as "Read" or "Reading" to see them here',
+    'retos.title':'🎯 Yearly challenges','retos.newBtn':'+ New challenge',
+    'bingo.title':'🏆 5×5 Reading Bingo','bingo.reset':'🔄 Reset',
+    'bingo.subtitle':'Check each square when you complete the challenge. Get 5 in a row for BINGO!',
+    'bingo.stats':'{checked}/25 squares · {lines} line(s) completed',
+    'bingo.editBtn':'✏️ Edit squares','bingo.editTitle':'✏️ Edit Bingo squares',
+    'bingo.editSubtitle':'Customize the 25 challenges. Leave a field empty to keep the current text.',
+    'bingo.resetTexts':'↺ Default text','bingo.saveTexts':'💾 Save texts',
+    'setup.personal':'👤 Personalization','setup.nameLabel':'Your name','setup.save':'Save',
+    'setup.config':'⚙️ Settings','setup.goalLabel':'🎯 Yearly book goal',
+    'setup.yearLabel':'📅 Current year','setup.langLabel':'🌍 Language / Idioma',
+    'setup.saveChanges':'Save changes','setup.paletteTitle':'🎨 Color palette',
+    'setup.paletteSubtitle':'Combine it with light/dark mode using the 🌙 button in the top right.',
+    'setup.dataTitle':'🗑️ Data zone','setup.dataSubtitle':'"Restore examples" replaces everything with demo data.',
+    'setup.restore':'🔄 Restore examples','setup.wipe':'🗑️ Delete all',
+    'modal.editTitle':'✏️ Edit book','modal.cancel':'Cancel','modal.save':'💾 Save changes',
+    'modal.update':'✅ Update','modal.progressTitle':'📖 Update progress',
+    'modal.retoTitle':'🎯 New challenge','modal.retoTitleEdit':'✏️ Edit challenge','modal.saveShort':'💾 Save',
+    'toast.bookAdded':'✅ Book added','toast.changesSaved':'💾 Changes saved',
+    'toast.progressUpdated':'📖 Progress updated','toast.bookFinished':'🎉 Book finished!',
+    'toast.bookDeleted':'🗑️ Book deleted','toast.backupSaved':'💾 Backup downloaded',
+    'toast.imported':'✅ Imported successfully','toast.settingsSaved':'✅ Settings saved',
+    'toast.retoSaved':'💾 Challenge saved','toast.retoDeleted':'🗑️ Challenge deleted',
+    'toast.bingoReset':'🔄 Bingo reset','toast.examplesRestored':'📚 Examples restored',
+    'toast.wiped':'🗑️ Library wiped','toast.nameSaved':'👤 Name saved',
+    'toast.bingoLine':'🎉 BINGO! You completed {n} line(s)','toast.retoDone':'🎉 Challenge completed: {name}!',
+    'toast.bingoTextsSaved':'💾 Bingo squares saved','toast.bingoTextsReset':'↺ Default text restored',
+    'confirm.deleteBook':'Delete "{title}"?','confirm.deleteReto':'Delete this challenge?',
+    'confirm.resetBingo':'Reset the whole bingo? All 25 squares will be unchecked.',
+    'confirm.import':'Import {n} books? Current ones will be replaced.',
+    'confirm.wipe1':'⚠️ This will delete ALL your books, challenges and bingo. Continue?',
+    'confirm.wipe2':'Are you completely sure? This cannot be undone.',
+    'confirm.restore':'This will replace your current data with the examples. Continue?',
+    'confirm.bingoResetTexts':'Restore default texts? Your customizations will be lost.',
+    'chart.noChart':'Chart.js failed to load. Check your internet connection.',
+    'chart.booksRead':'Books read','chart.books':'book','chart.booksPlural':'books',
+    'footer.version':'· Version 1.0','footer.dev':'Developed by:','footer.rights':'© 2026 All rights reserved.'
+  }
+};
+
+let LANG = localStorage.getItem('booktracker_lang') || 'es';
+function t(key, vars){
+  let s = (I18N[LANG] && I18N[LANG][key]) || (I18N.es[key]) || key;
+  if(vars) Object.keys(vars).forEach(k => { s = s.replace(new RegExp('\\{' + k + '\\}', 'g'), vars[k]); });
+  return s;
+}
+
+/*    2. CONSTANTES Y DATOS POR DEFECTO */
+
+const STORAGE_KEY  = 'booktracker_data_v6';
+const THEME_KEY    = 'booktracker_theme';
+const PALETTE_KEY  = 'booktracker_palette';
+const NAME_KEY     = 'booktracker_name';
+
+const DEFAULT_GENRES = ['Romance','Fantasía','Ciencia Ficción','Thriller','Misterio',
+  'Histórico','Contemporáneo','Poesía','No Ficción','Autoayuda',
+  'Biografía','Terror','Distopía','Clásico'];
+
+const FORMATS = [
+  { id:'Físico',     es:'Físico',     en:'Physical' },
+  { id:'Digital',    es:'Digital',    en:'Digital'  },
+  { id:'Audiolibro', es:'Audiolibro', en:'Audiobook'}
+];
+
+const STATUSES = [
+  { id:'Por leer',    es:'Por leer',    en:'To read' },
+  { id:'Leyendo',     es:'Leyendo',     en:'Reading' },
+  { id:'Leído',       es:'Leído',       en:'Read' },
+  { id:'Pausado',     es:'Pausado',     en:'Paused' },
+  { id:'Abandonado',  es:'Abandonado',  en:'Dropped' }
+];
+
+const RATINGS = ['⭐','⭐⭐','⭐⭐⭐','⭐⭐⭐⭐','⭐⭐⭐⭐⭐'];
+
+const BINGO_CELLS_ES = [
+  'Un libro con portada azul','Un libro de +500 págs','Un libro recomendado',
+  'Publicado este año','Un autor que no conoces',
+  'Un libro en otro idioma','Un clásico','Con adaptación al cine',
+  'Que empiece por A','De menos de 200 págs',
+  'Un libro de terror','Un libro de fantasía','Un libro de no ficción',
+  'Un autor latinoamericano','Un libro que te regalaron',
+  'Que empiece por S','Con un animal en la portada','Que llevas tiempo postergando',
+  'Un libro de poesía','Protagonista femenina',
+  'Un autor fallecido','Primero de una saga','Un libro de romance',
+  'Un libro premiado','Un libro de ciencia ficción'
+];
+const BINGO_CELLS_EN = [
+  'A book with a blue cover','A book over 500 pages','A recommended book',
+  'Published this year','An author you don\'t know',
+  'A book in another language','A classic','Adapted to film',
+  'Starting with A','Under 200 pages',
+  'A horror book','A fantasy book','A non-fiction book',
+  'A Latin American author','A book you were gifted',
+  'Starting with S','With an animal on the cover','You\'ve been putting off',
+  'A poetry book','Female protagonist',
+  'A deceased author','First in a series','A romance book',
+  'An award-winning book','A science fiction book'
+];
+
+const DEFAULT_RETOS = [
+  { id:'auto-anual', nombre:'📚', auto:'anual', meta:24, actual:0 },
+  { id:'r2', nombre:'📖', meta:12, actual:0, notes_es:'Uno al mes', notes_en:'One per month' },
+  { id:'r3', nombre:'🏁', meta:3,  actual:0, notes_es:'Sagas terminadas', notes_en:'Finished series' },
+  { id:'r4', nombre:'🇬🇧', meta:5, actual:0, notes_es:'Libros en inglés', notes_en:'Books in English' },
+  { id:'auto-bingo', nombre:'🏆', auto:'bingo', meta:25, actual:0 }
+];
+
+const cover = isbn => 'https://covers.openlibrary.org/b/isbn/' + isbn + '-L.jpg';
+const Y = new Date().getFullYear();
+
+const EXAMPLE_BOOKS = [
+  { id:1, title:'Una Corte de Rosas y Espinas', author:'Sarah J. Maas',
+    cover:cover('9781619634442'), series:'Una Corte de Rosas y Espinas',
+    volume:'1', genre:'Fantasía', format:'Físico', pages:528, pagesRead:528,
+    status:'Leído', start:Y+'-01-10', end:Y+'-01-25', rating:'⭐⭐⭐⭐⭐',
+    notes:'«No me asustan los monstruos, me asustan los humanos.»' },
+  { id:2, title:'Una Corte de Niebla y Furia', author:'Sarah J. Maas',
+    cover:cover('9781619634466'), series:'Una Corte de Rosas y Espinas',
+    volume:'2', genre:'Fantasía', format:'Físico', pages:656, pagesRead:656,
+    status:'Leído', start:Y+'-01-28', end:Y+'-02-18', rating:'⭐⭐⭐⭐⭐',
+    notes:'Capítulo 55. Lloré.' },
+  { id:3, title:'El Nombre del Viento', author:'Patrick Rothfuss',
+    cover:cover('9780756404741'), series:'Crónica del Asesino de Reyes',
+    volume:'1', genre:'Fantasía', format:'Digital', pages:880, pagesRead:880,
+    status:'Leído', start:Y+'-02-20', end:Y+'-03-15', rating:'⭐⭐⭐⭐',
+    notes:'La prosa es poesía pura.' },
+  { id:4, title:'La Chica del Tren', author:'Paula Hawkins',
+    cover:cover('9781594633669'), series:'', volume:'', genre:'Thriller',
+    format:'Audiolibro', pages:416, pagesRead:416, status:'Leído',
+    start:Y+'-03-18', end:Y+'-03-28', rating:'⭐⭐⭐',
+    notes:'Buen ritmo, final predecible.' },
+  { id:5, title:'Dune', author:'Frank Herbert',
+    cover:cover('9780441013593'), series:'Dune', volume:'1',
+    genre:'Ciencia Ficción', format:'Digital', pages:688, pagesRead:688,
+    status:'Leído', start:Y+'-04-05', end:Y+'-04-30', rating:'⭐⭐⭐⭐⭐',
+    notes:'«El miedo es el asesino de la mente.»' },
+  { id:6, title:'Orgullo y Prejuicio', author:'Jane Austen',
+    cover:cover('9780141439518'), series:'', volume:'', genre:'Clásico',
+    format:'Físico', pages:432, pagesRead:210, status:'Leyendo',
+    start:Y+'-05-02', end:'', rating:'', notes:'Releyendo por 4ª vez.' },
+  { id:7, title:'El Hobbit', author:'J.R.R. Tolkien',
+    cover:cover('9780547928227'), series:'El Señor de los Anillos', volume:'0',
+    genre:'Fantasía', format:'Físico', pages:310, pagesRead:0,
+    status:'Por leer', start:'', end:'', rating:'', notes:'Pendiente para el otoño.' },
+  { id:8, title:'Cien Años de Soledad', author:'Gabriel García Márquez',
+    cover:cover('9780060883287'), series:'', volume:'', genre:'Clásico',
+    format:'Físico', pages:417, pagesRead:145, status:'Leyendo',
+    start:Y+'-05-20', end:'', rating:'', notes:'Realismo mágico puro.' }
+];
+
+const DEFAULT_DATA = {
+  config: { goal: 24, year: Y },
+  genres: [...DEFAULT_GENRES],
+  books: [],
+  retos: [],
+  bingo: { cells: [] }
+};
+
+/*    3. CARGA / GUARDADO */
+
+let data = loadData();
+let monthlyChart = null;
+let formatChart = null;
+
+function loadData(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+      || localStorage.getItem('booktracker_data_v5')
+      || localStorage.getItem('booktracker_data_v4')
+      || localStorage.getItem('booktracker_data_v3')
+      || localStorage.getItem('booktracker_data_v2');
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(!parsed.retos) parsed.retos = structuredClone(DEFAULT_RETOS);
+      if(!parsed.bingo || !parsed.bingo.cells) parsed.bingo = createBingo(LANG);
+      parsed.books = (parsed.books || []).map(b => ({
+        ...b, pagesRead: parseInt(b.pagesRead) || 0
+      }));
+      return parsed;
+    }
+    const initial = structuredClone(DEFAULT_DATA);
+    initial.books = structuredClone(EXAMPLE_BOOKS);
+    initial.retos = structuredClone(DEFAULT_RETOS);
+    initial.bingo = createBingo(LANG);
+    return initial;
+  } catch(e){
+    console.error('Error cargando datos:', e);
+    const d = structuredClone(DEFAULT_DATA);
+    d.books = structuredClone(EXAMPLE_BOOKS);
+    d.retos = structuredClone(DEFAULT_RETOS);
+    d.bingo = createBingo(LANG);
+    return d;
+  }
+}
+function createBingo(lang){
+  const cells = (lang === 'en' ? BINGO_CELLS_EN : BINGO_CELLS_ES);
+  return { cells: cells.map(text => ({ text, checked: false })) };
+}
+function saveData(){
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+  catch(e){ showToast('⚠️ ' + e.message); }
+}
+
+/*    4. UTILIDADES DE COLOR */
+
+function hexToRgb(hex){
+  hex = hex.replace('#','');
+  if(hex.length === 3) hex = hex.split('').map(c=>c+c).join('');
+  return [parseInt(hex.substr(0,2),16), parseInt(hex.substr(2,2),16), parseInt(hex.substr(4,2),16)];
+}
+function rgbToHex(r,g,b){
+  return '#' + [r,g,b].map(v => Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
+}
+function mixHex(a, b, ratio){
+  const A = hexToRgb(a), B = hexToRgb(b);
+  return rgbToHex(A[0]*(1-ratio)+B[0]*ratio, A[1]*(1-ratio)+B[1]*ratio, A[2]*(1-ratio)+B[2]*ratio);
+}
+
+/*    5. TEMA + PALETA */
+
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('themeToggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+function applyPalette(palette){
+  if(palette === 'custom') palette = 'aesthetic';
+  document.documentElement.setAttribute('data-palette', palette);
+  document.querySelectorAll('.palette-swatch').forEach(sw => {
+    sw.classList.toggle('active', sw.dataset.palette === palette);
+  });
+  if(monthlyChart) renderMonthlyChart();
+  if(formatChart) renderFormatChart();
+}
+function toggleTheme(){
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  localStorage.setItem(THEME_KEY, next);
+  applyTheme(next);
+}
+
+/*    6. IDIOMA */
+
+function applyLanguage(){
+  document.documentElement.lang = LANG;
+  document.getElementById('langToggle').textContent = LANG === 'es' ? 'ES' : 'EN';
+  document.getElementById('langSelect').value = LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.dataset.i18n;
+    if(I18N[LANG][k] || I18N.es[k]) el.textContent = t(k);
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    el.placeholder = t(el.dataset.i18nPlaceholder);
+  });
+  populateSelects();
+  const filter = document.getElementById('filterStatus');
+  filter.innerHTML = '<option value="">' + t('log.filterAll') + '</option>' +
+    STATUSES.map(s => '<option value="' + s.id + '">' + s[LANG] + '</option>').join('');
+  renderGreeting();
+}
+function populateSelects(){
+  const genres = '<option value="">— ' + t('form.genre') + ' —</option>' +
+    data.genres.map(g => '<option>' + esc(g) + '</option>').join('');
+  const formats = '<option value="">— ' + t('form.format') + ' —</option>' +
+    FORMATS.map(f => '<option value="' + f.id + '">' + f[LANG] + '</option>').join('');
+  const statuses = STATUSES.map(s => '<option value="' + s.id + '">' + s[LANG] + '</option>').join('');
+  const ratings = '<option value="">— ' + t('form.rating') + ' —</option>' +
+    RATINGS.map(r => '<option>' + r + '</option>').join('');
+  document.getElementById('genreSelect').innerHTML = genres;
+  document.getElementById('formatSelect').innerHTML = formats;
+  document.getElementById('statusSelect').innerHTML = statuses;
+  document.getElementById('ratingSelect').innerHTML = ratings;
+  document.getElementById('editGenreSelect').innerHTML = genres;
+  document.getElementById('editFormatSelect').innerHTML = formats;
+  document.getElementById('editStatusSelect').innerHTML = statuses;
+  document.getElementById('editRatingSelect').innerHTML = ratings;
+}
+
+/*    7. NOMBRE */
+
+function getUserName(){ return localStorage.getItem(NAME_KEY) || ''; }
+function renderGreeting(){
+  const name = getUserName();
+  const el = document.getElementById('greeting');
+  if(!el) return;
+  el.textContent = name ? t('app.greeting', { name }) : t('app.greetingEmpty');
+}
+document.getElementById('personalForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = document.getElementById('nameInput').value.trim();
+  if(name) localStorage.setItem(NAME_KEY, name);
+  else localStorage.removeItem(NAME_KEY);
+  renderGreeting();
+  showToast(t('toast.nameSaved'));
+});
+
+/*    8. NAVEGACIÓN */
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+    if(tab.dataset.tab === 'dashboard'){ renderDashboard(); renderMonthlyChart(); renderFormatChart(); }
+    if(tab.dataset.tab === 'shelf')     renderShelf();
+    if(tab.dataset.tab === 'retos')     renderRetosPanel();
+  });
+});
+
+/*    9. AÑADIR LIBRO */
+
+document.getElementById('bookForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const book = Object.fromEntries(fd.entries());
+  book.id = Date.now();
+  book.pagesRead = parseInt(book.pagesRead) || 0;
+  autoUpdateStatus(book);
+  data.books.push(book);
+  saveData();
+  e.target.reset();
+  renderAll();
+  showToast(t('toast.bookAdded'));
+});
+function autoUpdateStatus(b){
+  const total = parseInt(b.pages) || 0;
+  const read  = parseInt(b.pagesRead) || 0;
+  if(total && read >= total && b.status !== 'Leído'){
+    b.status = 'Leído';
+    if(!b.end) b.end = new Date().toISOString().slice(0,10);
+  } else if(read > 0 && b.status === 'Por leer'){
+    b.status = 'Leyendo';
+    if(!b.start) b.start = new Date().toISOString().slice(0,10);
+  }
+}
+
+/*    10. EDITAR LIBRO */
+
+function openEditModal(id){
+  const b = data.books.find(x => x.id === id);
+  if(!b) return;
+  const f = document.getElementById('editForm');
+  ['id','title','author','cover','series','volume','genre','format','pages','pagesRead',
+   'status','rating','start','end','notes'].forEach(k => {
+    const el = f.querySelector('[name=' + k + ']');
+    if(el) el.value = b[k] || '';
+  });
+  openModal('editModal');
+}
+document.getElementById('editForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const updated = Object.fromEntries(fd.entries());
+  const id = parseInt(updated.id);
+  const idx = data.books.findIndex(x => x.id === id);
+  if(idx === -1) return;
+  updated.id = id;
+  updated.pagesRead = parseInt(updated.pagesRead) || 0;
+  autoUpdateStatus(updated);
+  data.books[idx] = updated;
+  saveData();
+  closeModal('editModal');
+  renderAll();
+  showToast(t('toast.changesSaved'));
+});
+
+/*    11. PROGRESO RÁPIDO */
+
+function openPagesModal(id){
+  const b = data.books.find(x => x.id === id);
+  if(!b) return;
+  document.getElementById('pagesBookTitle').textContent = '📖 ' + b.title + ' — ' + b.author;
+  const total = parseInt(b.pages) || 0;
+  const read  = parseInt(b.pagesRead) || 0;
+  const pct   = total ? Math.round(read / total * 100) : 0;
+  document.getElementById('pagesCurrentInfo').innerHTML = total ?
+    '<div style="font-size:12px;color:var(--muted);margin-bottom:6px;">' +
+      read + ' / ' + total + ' (' + pct + '%)</div>' +
+    '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>' : '';
+  const f = document.getElementById('pagesForm');
+  f.querySelector('[name=id]').value = b.id;
+  f.querySelector('[name=pagesRead]').value = read;
+  openModal('pagesModal');
+  setTimeout(() => f.querySelector('[name=pagesRead]').select(), 100);
+}
+document.getElementById('pagesForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const id = parseInt(fd.get('id'));
+  const newRead = Math.max(0, parseInt(fd.get('pagesRead')) || 0);
+  const idx = data.books.findIndex(x => x.id === id);
+  if(idx === -1) return;
+  const b = data.books[idx];
+  const total = parseInt(b.pages) || 0;
+  b.pagesRead = newRead;
+  let msg = t('toast.progressUpdated');
+  if(total && newRead >= total && b.status !== 'Leído'){
+    b.status = 'Leído';
+    if(!b.end) b.end = new Date().toISOString().slice(0,10);
+    msg = t('toast.bookFinished');
+  } else if(newRead > 0 && b.status === 'Por leer'){
+    b.status = 'Leyendo';
+    if(!b.start) b.start = new Date().toISOString().slice(0,10);
+  }
+  saveData();
+  closeModal('pagesModal');
+  renderAll();
+  showToast(msg);
+});
+
+/*    12. BORRAR LIBRO */
+
+function deleteBook(id){
+  const b = data.books.find(x => x.id === id);
+  if(!b) return;
+  if(!confirm(t('confirm.deleteBook', { title: b.title }))) return;
+  data.books = data.books.filter(x => x.id !== id);
+  saveData();
+  renderAll();
+  showToast(t('toast.bookDeleted'));
+}
+
+/*    13. MODALES */
+
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-bg').forEach(m => {
+  m.addEventListener('click', e => { if(e.target === m) m.classList.remove('open'); });
+});
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape')
+    document.querySelectorAll('.modal-bg.open').forEach(m => m.classList.remove('open'));
+});
+
+/*    14. TOAST */
+
+let toastTimer;
+function showToast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+/*    15. PROGRESO helper */
+
+function progressInfo(b){
+  const total = parseInt(b.pages) || 0;
+  const read  = parseInt(b.pagesRead) || 0;
+  if(!total) return { pct: 0, text: read ? read + ' p' : '—' };
+  const pct = Math.min(100, Math.round(read / total * 100));
+  return { pct, text: read + '/' + total };
+}
+
+/*   16. RENDER — BOOK LOG */
+
+function renderLog(){
+  const search = document.getElementById('search').value.toLowerCase();
+  const filterStatus = document.getElementById('filterStatus').value;
+  const filtered = data.books.filter(b => {
+    const ms = !search ||
+      (b.title || '').toLowerCase().includes(search) ||
+      (b.author || '').toLowerCase().includes(search) ||
+      (b.series || '').toLowerCase().includes(search);
+    const mt = !filterStatus || b.status === filterStatus;
+    return ms && mt;
+  });
+  const tbody = document.getElementById('logBody');
+  if(!filtered.length){
+    tbody.innerHTML = '<tr><td colspan="9" class="empty">' + t('log.empty') + '</td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map(b => {
+    const p = progressInfo(b);
+    const seriesLine = b.series ? '<br><span style="font-size:10px;color:var(--muted)">' +
+      esc(b.series) + ' #' + esc(b.volume || '?') + '</span>' : '';
+    const formatLabel = labelFor('format', b.format);
+    const statusLabel = labelFor('status', b.status);
+    return '<tr>' +
+      '<td><strong>' + esc(b.title) + '</strong>' + seriesLine + '</td>' +
+      '<td>' + esc(b.author) + '</td>' +
+      '<td>' + esc(b.genre || '—') + '</td>' +
+      '<td>' + esc(formatLabel) + '</td>' +
+      '<td><div class="mini-bar"><div class="mini-fill" style="width:' + p.pct + '%"></div></div>' +
+        '<div class="mini-text">' + p.text + ' · ' + p.pct + '%</div></td>' +
+      '<td><span class="badge b-' + slug(b.status) + '">' + esc(statusLabel) + '</span></td>' +
+      '<td>' + (b.end || '—') + '</td>' +
+      '<td style="text-align:center;">' + (b.rating || '—') + '</td>' +
+      '<td><div style="display:flex;gap:4px;">' +
+        '<button class="ghost icon-btn" onclick="openPagesModal(' + b.id + ')">📖</button>' +
+        '<button class="ghost icon-btn" onclick="openEditModal(' + b.id + ')">✏️</button>' +
+        '<button class="danger icon-btn" onclick="deleteBook(' + b.id + ')">✕</button>' +
+      '</div></td></tr>';
+  }).join('');
+}
+function labelFor(kind, id){
+  if(kind === 'format'){ const f = FORMATS.find(x => x.id === id); return f ? f[LANG] : (id || '—'); }
+  if(kind === 'status'){ const s = STATUSES.find(x => x.id === id); return s ? s[LANG] : (id || '—'); }
+  return id;
+}
+
+/*    17. RENDER — DASHBOARD */
+
+function renderDashboard(){
+  const leidos = data.books.filter(b => b.status === 'Leído');
+  const leyendo = data.books.filter(b => b.status === 'Leyendo');
+  const paginas = leidos.reduce((s,b) => s + (parseInt(b.pages) || 0), 0);
+  const meta = data.config.goal || 1;
+  const pct = Math.min(100, Math.round(leidos.length / meta * 100));
+  const paginasEnCurso = leyendo.reduce((s,b) => s + (parseInt(b.pagesRead) || 0), 0);
+
+  document.getElementById('kpis').innerHTML =
+    '<div class="kpi"><div class="label">' + t('dash.kpiBooks') + '</div><div class="value">' + leidos.length + '</div></div>' +
+    '<div class="kpi"><div class="label">' + t('dash.kpiPages') + '</div><div class="value">' + paginas.toLocaleString() + '</div></div>' +
+    '<div class="kpi"><div class="label">' + t('dash.kpiReading') + '</div><div class="value">' + leyendo.length + '</div></div>' +
+    '<div class="kpi"><div class="label">' + t('dash.kpiPct') + '</div><div class="value">' + pct + '%</div></div>';
+
+  document.getElementById('goalProgress').style.width = pct + '%';
+  let goalTxt = t('dash.goalText', { n: leidos.length, meta, pages: paginas.toLocaleString() });
+  if(paginasEnCurso) goalTxt += t('dash.goalExtra', { p: paginasEnCurso.toLocaleString() });
+  document.getElementById('goalText').textContent = goalTxt;
+
+  const porGenero = {};
+  leidos.forEach(b => { if(b.genre) porGenero[b.genre] = (porGenero[b.genre] || 0) + 1; });
+  const ordenado = Object.entries(porGenero).sort((a,b) => b[1] - a[1]);
+  const max = ordenado.length ? ordenado[0][1] : 1;
+  document.getElementById('genreStats').innerHTML = ordenado.length
+    ? ordenado.map(([g,n]) =>
+        '<div style="margin-bottom:10px;">' +
+          '<div style="display:flex;justify-content:space-between;font-size:12px;">' +
+            '<span>' + esc(g) + '</span><span><strong>' + n + '</strong></span></div>' +
+          '<div class="progress-bar"><div class="progress-fill" style="width:' + (n/max*100) + '%"></div></div></div>'
+      ).join('')
+    : '<p class="empty">' + t('dash.emptyGenre') + '</p>';
+}
+
+/*   18. RENDER — SHELF */
+
+function renderShelf(){
+  const libros = data.books.filter(b => b.status === 'Leído' || b.status === 'Leyendo');
+  const grid = document.getElementById('shelfGrid');
+  if(!libros.length){
+    grid.innerHTML = '<p class="empty">' + t('shelf.empty') + '</p>';
+    return;
+  }
+  grid.innerHTML = libros.map(b => {
+    const p = progressInfo(b);
+    const imgHTML = b.cover
+      ? '<img src="' + esc(b.cover) + '" alt="" onerror="this.outerHTML=\'<div style=&quot;height:170px;display:flex;align-items:center;justify-content:center;background:var(--soft);border-radius:6px;font-size:34px;&quot;>📕</div>\'">'
+      : '<div style="height:170px;display:flex;align-items:center;justify-content:center;background:var(--soft);border-radius:6px;font-size:34px;">📕</div>';
+    const progressHTML = b.pages
+      ? '<div class="mini-bar" style="width:100%;margin-top:6px;">' +
+          '<div class="mini-fill" style="width:' + p.pct + '%"></div></div>' +
+        '<div class="mini-text" style="text-align:center;margin-top:2px;">' + p.text + '</div>' : '';
+    return '<div class="book">' + imgHTML +
+      '<div class="title">' + esc(b.title) + '</div>' +
+      '<div class="author">' + esc(b.author) + '</div>' +
+      progressHTML +
+      '<div style="font-size:12px;margin-top:4px;">' + (b.rating || '') + '</div></div>';
+  }).join('');
+}
+
+/*    19. RENDER — RETOS + BINGO */
+
+function renderRetosPanel(){
+  renderMonthlyChart();
+  renderFormatChart();
+  renderRetos();
+  renderBingo();
+}
+function retoName(r){
+  if(r.auto === 'anual') return LANG === 'en' ? '📚 Yearly book goal' : '📚 Reto anual de libros';
+  if(r.auto === 'bingo') return LANG === 'en' ? '🏆 Complete Bingo'  : '🏆 Bingo completo';
+  return r.nombre || '🎯 ' + (LANG === 'en' ? 'Challenge' : 'Reto');
+}
+function renderRetos(){
+  const container = document.getElementById('retosList');
+  const leidos = data.books.filter(b => b.status === 'Leído').length;
+  const bingoChecked = data.bingo.cells.filter(c => c.checked).length;
+  container.innerHTML = data.retos.map(r => {
+    let actual = r.actual || 0;
+    let meta = r.meta || 1;
+    let isAuto = false;
+    if(r.auto === 'anual'){ actual = leidos; meta = data.config.goal || 1; isAuto = true; }
+    else if(r.auto === 'bingo'){ actual = bingoChecked; isAuto = true; }
+    const pct = meta ? Math.min(100, Math.round(actual / meta * 100)) : 0;
+    const buttons = isAuto
+      ? '<span style="font-size:10px;color:var(--muted);padding:3px 8px;background:var(--card);border:1px solid var(--border);border-radius:12px;">auto</span>'
+      : '<div style="display:flex;gap:4px;flex-wrap:wrap;">' +
+          '<button class="ghost icon-btn" onclick="retoAdjust(\'' + r.id + '\', -1)">−</button>' +
+          '<button class="ghost icon-btn" onclick="retoAdjust(\'' + r.id + '\', 1)">+</button>' +
+          '<button class="ghost icon-btn" onclick="openRetoModal(\'' + r.id + '\')">✏️</button>' +
+          '<button class="danger icon-btn" onclick="deleteReto(\'' + r.id + '\')">✕</button></div>';
+    const notes = LANG === 'en' ? (r.notes_en || r.notas || '') : (r.notes_es || r.notas || '');
+    return '<div class="reto-item">' +
+      '<div class="reto-head"><div><strong>' + esc(retoName(r)) + '</strong>' +
+        '<span style="font-size:11px;color:var(--muted);margin-left:8px;">' + actual + ' / ' + meta + '</span></div>' + buttons + '</div>' +
+      '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+      '<div style="font-size:11px;color:var(--muted);margin-top:6px;">' + pct + '%' + (notes ? ' · ' + esc(notes) : '') + '</div></div>';
+  }).join('');
+}
+function retoAdjust(id, delta){
+  const r = data.retos.find(x => x.id === id);
+  if(!r || r.auto) return;
+  r.actual = Math.max(0, (r.actual || 0) + delta);
+  saveData();
+  renderRetos();
+  if(r.actual >= r.meta) showToast(t('toast.retoDone', { name: retoName(r) }));
+}
+function openRetoModal(id){
+  const f = document.getElementById('retoForm');
+  const title = document.getElementById('retoModalTitle');
+  if(id){
+    const r = data.retos.find(x => x.id === id);
+    if(!r || r.auto) return;
+    title.dataset.i18n = 'modal.retoTitleEdit';
+    title.textContent = t('modal.retoTitleEdit');
+    f.querySelector('[name=id]').value     = r.id;
+    f.querySelector('[name=nombre]').value = r.nombre || '';
+    f.querySelector('[name=meta]').value   = r.meta;
+    f.querySelector('[name=actual]').value = r.actual;
+    f.querySelector('[name=notas]').value  = r.notas || '';
+  } else {
+    title.dataset.i18n = 'modal.retoTitle';
+    title.textContent = t('modal.retoTitle');
+    f.reset();
+    f.querySelector('[name=id]').value = '';
+  }
+  openModal('retoModal');
+}
+document.getElementById('retoForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const id = fd.get('id');
+  const payload = {
+    nombre: fd.get('nombre').trim(),
+    meta:   Math.max(1, parseInt(fd.get('meta')) || 1),
+    actual: Math.max(0, parseInt(fd.get('actual')) || 0),
+    notas:  (fd.get('notas') || '').trim()
+  };
+  if(id){
+    const idx = data.retos.findIndex(x => x.id === id);
+    if(idx > -1) data.retos[idx] = { ...data.retos[idx], ...payload };
+  } else {
+    data.retos.push({ id:'r-' + Date.now(), ...payload });
+  }
+  saveData();
+  closeModal('retoModal');
+  renderRetos();
+  showToast(t('toast.retoSaved'));
+});
+function deleteReto(id){
+  if(!confirm(t('confirm.deleteReto'))) return;
+  data.retos = data.retos.filter(r => r.id !== id);
+  saveData();
+  renderRetos();
+  showToast(t('toast.retoDeleted'));
+}
+
+function renderBingo(){
+  const grid = document.getElementById('bingoGrid');
+  grid.innerHTML = data.bingo.cells.map((c, i) =>
+    '<div class="bingo-cell' + (c.checked ? ' checked' : '') +
+      '" onclick="toggleBingoCell(' + i + ')">' + esc(c.text) + '</div>').join('');
+  const checked = data.bingo.cells.filter(c => c.checked).length;
+  const lines = checkBingoLines();
+  document.getElementById('bingoStats').textContent = t('bingo.stats', { checked, lines });
+}
+function toggleBingoCell(i){
+  const before = checkBingoLines();
+  data.bingo.cells[i].checked = !data.bingo.cells[i].checked;
+  const after = checkBingoLines();
+  saveData();
+  renderBingo();
+  renderRetos();
+  if(after > before) showToast(t('toast.bingoLine', { n: after }));
+}
+function checkBingoLines(){
+  const c = data.bingo.cells;
+  const isOn = i => c[i].checked;
+  let lines = 0;
+  for(let r = 0; r < 5; r++) if([0,1,2,3,4].every(x => isOn(r*5 + x))) lines++;
+  for(let col = 0; col < 5; col++) if([0,1,2,3,4].every(r => isOn(r*5 + col))) lines++;
+  if([0,6,12,18,24].every(isOn)) lines++;
+  if([4,8,12,16,20].every(isOn)) lines++;
+  return lines;
+}
+function resetBingo(){
+  if(!confirm(t('confirm.resetBingo'))) return;
+  data.bingo.cells.forEach(c => c.checked = false);
+  saveData();
+  renderBingo();
+  renderRetos();
+  showToast(t('toast.bingoReset'));
+}
+function openBingoEditModal(){
+  const grid = document.getElementById('bingoEditGrid');
+  grid.innerHTML = data.bingo.cells.map((c, i) =>
+    '<input data-idx="' + i + '" value="' + esc(c.text) + '" maxlength="60" title="' + (i+1) + '">').join('');
+  openModal('bingoEditModal');
+  setTimeout(() => {
+    const first = document.querySelector('#bingoEditGrid input');
+    if(first) first.focus();
+  }, 100);
+}
+function saveBingoTexts(){
+  const inputs = document.querySelectorAll('#bingoEditGrid input');
+  if(!inputs.length) return;
+  inputs.forEach(inp => {
+    const i = parseInt(inp.dataset.idx);
+    const v = inp.value.trim();
+    if(v && v !== data.bingo.cells[i].text){
+      data.bingo.cells[i].text = v;
+    }
+  });
+  saveData();
+  closeModal('bingoEditModal');
+  renderBingo();
+  showToast(t('toast.bingoTextsSaved'));
+}
+function resetBingoTexts(){
+  if(!confirm(t('confirm.bingoResetTexts'))) return;
+  const defaults = (LANG === 'en' ? BINGO_CELLS_EN : BINGO_CELLS_ES);
+  data.bingo.cells.forEach((c, i) => { c.text = defaults[i]; });
+  saveData();
+  const inputs = document.querySelectorAll('#bingoEditGrid input');
+  inputs.forEach(inp => { inp.value = data.bingo.cells[parseInt(inp.dataset.idx)].text; });
+  renderBingo();
+  showToast(t('toast.bingoTextsReset'));
+}
+
+/*    20. GRÁFICOS */
+
+function chartColors(){
+  const css = getComputedStyle(document.documentElement);
+  return {
+    header: css.getPropertyValue('--header').trim() || '#8B6F6F',
+    accent: css.getPropertyValue('--accent').trim() || '#D4A5A5',
+    text:   css.getPropertyValue('--text').trim()   || '#4A4A4A',
+    border: css.getPropertyValue('--border').trim() || '#EAD9D3',
+    card:   css.getPropertyValue('--card').trim()   || '#FFFFFF'
+  };
+}
+function renderMonthlyChart(){
+  const canvas = document.getElementById('monthlyChart');
+  if(!canvas) return;
+  document.getElementById('chartYear').textContent = data.config.year || Y;
+  if(typeof Chart === 'undefined'){
+    canvas.parentElement.innerHTML = '<p class="empty">' + t('chart.noChart') + '</p>';
+    return;
+  }
+  const year = data.config.year || Y;
+  const months = LANG === 'en'
+    ? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    : ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const counts = new Array(12).fill(0);
+  data.books.forEach(b => {
+    if(b.status !== 'Leído' || !b.end) return;
+    const d = new Date(b.end + 'T00:00:00');
+    if(d.getFullYear() === year) counts[d.getMonth()]++;
+  });
+  const c = chartColors();
+  if(monthlyChart){
+    monthlyChart.data.labels = months;
+    monthlyChart.data.datasets[0].data = counts;
+    monthlyChart.data.datasets[0].backgroundColor = c.header;
+    monthlyChart.data.datasets[0].hoverBackgroundColor = c.accent;
+    monthlyChart.options.scales.x.ticks.color = c.text;
+    monthlyChart.options.scales.y.ticks.color = c.text;
+    monthlyChart.options.scales.y.grid.color = c.border;
+    monthlyChart.options.plugins.tooltip.backgroundColor = c.header;
+    monthlyChart.update();
+    return;
+  }
+  monthlyChart = new Chart(canvas, {
+    type: 'bar',
+    data: { labels: months, datasets: [{
+      label: t('chart.booksRead'), data: counts,
+      backgroundColor: c.header, hoverBackgroundColor: c.accent,
+      borderRadius: 6, borderSkipped: false, maxBarThickness: 42
+    }]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: c.header, titleColor: '#fff', bodyColor: '#fff',
+          padding: 10, cornerRadius: 8, displayColors: false,
+          callbacks: {
+            label: ctx => ctx.parsed.y + ' ' + (ctx.parsed.y === 1 ? t('chart.books') : t('chart.booksPlural'))
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { color: c.text, font: { size: 11, weight: '600' } }, grid: { display: false }, border: { display: false } },
+        y: { beginAtZero: true, ticks: { color: c.text, stepSize: 1, font: { size: 11 } }, grid: { color: c.border }, border: { display: false } }
+      }
+    }
+  });
+}
+function renderFormatChart(){
+  const canvas = document.getElementById('formatChart');
+  if(!canvas) return;
+  if(typeof Chart === 'undefined'){
+    canvas.parentElement.innerHTML = '<p class="empty">' + t('chart.noChart') + '</p>';
+    return;
+  }
+  const counts = FORMATS.map(f => data.books.filter(b => b.format === f.id && b.status === 'Leído').length);
+  const labels = FORMATS.map(f => f[LANG]);
+  const c = chartColors();
+  const palette = [c.header, c.accent, mixHex(c.header, c.accent, 0.5)];
+  if(formatChart){
+    formatChart.data.labels = labels;
+    formatChart.data.datasets[0].data = counts;
+    formatChart.data.datasets[0].backgroundColor = palette;
+    formatChart.options.plugins.legend.labels.color = c.text;
+    formatChart.options.plugins.tooltip.backgroundColor = c.header;
+    formatChart.update();
+    return;
+  }
+  formatChart = new Chart(canvas, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data: counts, backgroundColor: palette, borderColor: c.card, borderWidth: 3, hoverOffset: 8 }]},
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '60%',
+      plugins: {
+        legend: { position: 'bottom', labels: { color: c.text, font: { size: 12, weight: '600' }, padding: 14, usePointStyle: true, pointStyle: 'circle' }},
+        tooltip: {
+          backgroundColor: c.header, titleColor: '#fff', bodyColor: '#fff', padding: 10, cornerRadius: 8,
+          callbacks: {
+            label: ctx => {
+              const total = ctx.dataset.data.reduce((a,b) => a+b, 0) || 1;
+              const pct = Math.round(ctx.parsed / total * 100);
+              return ' ' + ctx.parsed + ' ' + t('chart.booksPlural') + ' · ' + pct + '%';
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+/*    21. SETUP */
+
+function renderSetup(){
+  document.getElementById('goalInput').value = data.config.goal;
+  document.getElementById('yearInput').value = data.config.year;
+  document.getElementById('nameInput').value = getUserName();
+}
+document.getElementById('setupForm').addEventListener('submit', e => {
+  e.preventDefault();
+  data.config.goal = parseInt(document.getElementById('goalInput').value) || 1;
+  data.config.year = parseInt(document.getElementById('yearInput').value) || Y;
+  const newLang = document.getElementById('langSelect').value;
+  if(newLang !== LANG){
+    LANG = newLang;
+    localStorage.setItem('booktracker_lang', LANG);
+    applyLanguage();
+  }
+  saveData();
+  renderAll();
+  showToast(t('toast.settingsSaved'));
+});
+document.getElementById('langToggle').addEventListener('click', () => {
+  LANG = LANG === 'es' ? 'en' : 'es';
+  localStorage.setItem('booktracker_lang', LANG);
+  applyLanguage();
+  renderAll();
+});
+document.getElementById('langSelect').addEventListener('change', e => {
+  LANG = e.target.value;
+  localStorage.setItem('booktracker_lang', LANG);
+  applyLanguage();
+  renderAll();
+});
+
+/*    22. EXPORTAR / IMPORTAR */
+
+function exportJSON(){
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'booktracker_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(t('toast.backupSaved'));
+}
+document.getElementById('importFile').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try{
+      const imported = JSON.parse(ev.target.result);
+      if(!imported.books) throw new Error('Formato inválido');
+      if(!confirm(t('confirm.import', { n: imported.books.length }))) return;
+      if(!imported.retos) imported.retos = structuredClone(DEFAULT_RETOS);
+      if(!imported.bingo || !imported.bingo.cells) imported.bingo = createBingo(LANG);
+      data = imported;
+      saveData();
+      if(monthlyChart){ monthlyChart.destroy(); monthlyChart = null; }
+      if(formatChart){ formatChart.destroy(); formatChart = null; }
+      renderAll();
+      showToast(t('toast.imported'));
+    }catch(err){ alert('❌ ' + err.message); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+/*    23. RESET / RESTAURAR */
+
+function resetAll(){
+  if(!confirm(t('confirm.wipe1'))) return;
+  if(!confirm(t('confirm.wipe2'))) return;
+  data = structuredClone(DEFAULT_DATA);
+  data.retos = [];
+  data.bingo = { cells: [] };
+  saveData();
+  if(monthlyChart){ monthlyChart.destroy(); monthlyChart = null; }
+  if(formatChart){ formatChart.destroy(); formatChart = null; }
+  renderAll();
+  showToast(t('toast.wiped'));
+}
+function restoreExamples(){
+  if(!confirm(t('confirm.restore'))) return;
+  data = structuredClone(DEFAULT_DATA);
+  data.books = structuredClone(EXAMPLE_BOOKS);
+  data.retos = structuredClone(DEFAULT_RETOS);
+  data.bingo = createBingo(LANG);
+  saveData();
+  if(monthlyChart){ monthlyChart.destroy(); monthlyChart = null; }
+  if(formatChart){ formatChart.destroy(); formatChart = null; }
+  renderAll();
+  showToast(t('toast.examplesRestored'));
+}
+
+/*    24. UTILIDADES */
+
+function esc(s){
+  return String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+function slug(s){ return String(s||'').toLowerCase().replace(/\s+/g,''); }
+
+/*    25. PALETAS */
+
+function buildPaletteGrid(){
+  const palettes = [
+    { id:'aesthetic',      label:'Aesthetic',     colors:['#8B6F6F','#D4A5A5','#F7EBE6'] },
+    { id:'coquette',       label:'Coquette',      colors:['#C48B9F','#F0C8D8','#FCE9EF'] },
+    { id:'dark-academia',  label:'Dark Academia', colors:['#5C4A3A','#A88B6B','#E8DFD0'] },
+    { id:'pastel',         label:'Pastel',        colors:['#8FA8C8','#D5C6E8','#E0F0E8'] },
+    { id:'minimal',        label:'Minimal',       colors:['#2F2F2F','#BFC8C5','#F2F2F2'] }
+  ];
+  document.getElementById('paletteGrid').innerHTML = palettes.map(p =>
+    '<button class="palette-swatch" data-palette="' + p.id + '">' +
+      '<div class="swatch-row">' +
+        p.colors.map(col => '<span class="swatch-color" style="background:' + col + '"></span>').join('') +
+      '</div>' + p.label + '</button>').join('');
+  document.querySelectorAll('.palette-swatch').forEach(sw => {
+    sw.addEventListener('click', () => {
+      localStorage.setItem(PALETTE_KEY, sw.dataset.palette);
+      applyPalette(sw.dataset.palette);
+    });
+  });
+}
+
+/*    26. RENDER GLOBAL */
+
+function renderAll(){
+  renderDashboard();
+  renderLog();
+  renderShelf();
+  renderSetup();
+  renderRetos();
+  renderBingo();
+  renderMonthlyChart();
+  renderFormatChart();
+}
+
+/*    27. BOOT */
+
+buildPaletteGrid();
+applyTheme(localStorage.getItem(THEME_KEY) || 'light');
+let savedPalette = localStorage.getItem(PALETTE_KEY) || 'aesthetic';
+if(savedPalette === 'custom') savedPalette = 'aesthetic';
+applyPalette(savedPalette);
+applyLanguage();
+
+document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+document.getElementById('search').addEventListener('input', renderLog);
+document.getElementById('filterStatus').addEventListener('change', renderLog);
+
+renderAll();
+</script>
+</body>
+</html>
